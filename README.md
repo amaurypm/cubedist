@@ -14,7 +14,7 @@ chimeric variants, etc) and being structurally superimposed when the electrostat
 
 When the sizes of a specific pair of maps are not equal, two distances are computed and averaged for
 the pair, resizing each map at a time by interpolation to match the size of the other map, as the
-distance only makes sense for maps with exactly the same size.
+distance can only be calculated for maps with exactly the same size.
 
 ## Usage
 ```
