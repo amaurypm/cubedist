@@ -161,30 +161,29 @@ function main()
         exit(1)
     end
 
-    rmsd_mat = zeros(n, n)
+    rmsd_mat = (zeros(n, n) .- 1.0)
 
     cube1 = nothing
     cube2 = nothing
 
     # These cicle has to transverse the lower left corner of the matrix, excluding the diagonal.
-    for i in 1:n
-        for j in 1:n
-            if i > j
-                if isfile(unique_files[i]) && isfile(unique_files[j])
-                    try
-                        cube1 = parse_cube(unique_files[i])
-                        cube2 = parse_cube(unique_files[j])
-                    catch
-                        write(stderr, "ERROR: Couldn't parse provided map files, please check they are proper Gaussian cube files.")
-                        exit(1)
-                    end
+    for c in 1:(n - 1)
+        try
+            cube1 = parse_cube(unique_files[c])
+        catch
+            write(stderr, "ERROR: Couldn't parse $(unique_files[c]), please check it is a proper Gaussian cube file.")
+            exit(1)
+        end
 
-                    rmsd_mat[i, j] = distance(cube1, cube2)
-                else
-                    write(stderr, "ERROR: At least one of the provided file names does not correspond with a real file.\n")
-                    exit(1)
-                end
+        for r in (c + 1):n
+            try
+                cube2 = parse_cube(unique_files[r])
+            catch
+                write(stderr, "ERROR: Couldn't parse $(unique_files[r]), please check it is a proper Gaussian cube file.")
+                exit(1)
             end
+
+            rmsd_mat[r, c] = distance(cube1, cube2)
         end
     end
 
