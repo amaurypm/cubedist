@@ -8,7 +8,7 @@ using Distances
 function parse_commandline()
     s = ArgParseSettings()
     s.description = "Calculate the pairwise distances (rmsd) between a set of electrostatic maps, contained in Gaussian cube files, and report these distances in CSV and a Mega-compatible formats."
-    s.version = "1.0"
+    s.version = "1.1"
     s.add_version = true
 
     @add_arg_table! s begin
@@ -86,6 +86,7 @@ function distance(map1::GaussianCube, map2::GaussianCube)
 end
 
 function write_csv(filename::String, names::Array{String, 1}, mat::Array{Float64,2})
+    println("Writing file $filename")
     open(filename, "w") do output_file
         write(output_file, "maps")
         map_names::Array{String, 1} = []
@@ -112,6 +113,7 @@ function write_csv(filename::String, names::Array{String, 1}, mat::Array{Float64
 end
 
 function write_meg(filename::String, names::Array{String,1}, mat::Array{Float64,2})
+    println("Writing file $filename")
     open(filename, "w") do output_file
         write(output_file, "#mega\n")
         write(output_file, "!Title: Electrostatic map distances;\n")
@@ -176,6 +178,8 @@ function main()
             exit(1)
         end
 
+        print("$(unique_files[c]) vs \n")
+
         for r in (c + 1):n
             try
                 cube2 = parse_cube(unique_files[r])
@@ -184,9 +188,15 @@ function main()
                 exit(1)
             end
 
+            print("\t$(unique_files[r])... ")
+
             rmsd_mat[r, c] = distance(cube1, cube2)
+
+            @printf("%.1f\n", (rmsd_mat[r, c]))
         end
     end
+
+    println()
 
     write_csv(parsed_args["output"]*".csv", unique_files, rmsd_mat)
     write_meg(parsed_args["output"]*".meg", unique_files, rmsd_mat)
