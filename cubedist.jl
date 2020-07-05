@@ -138,7 +138,8 @@ function write_meg(filename::String, names::Array{String,1}, mat::Array{Float64,
         for i in 1:size(mat)[1]
             for j in 1:size(mat)[2]
                 if j == 1
-                    write(output_file, "[$i]   ")
+                    @printf(output_file, "[%2d]   ", i)
+                    #write(output_file, "[$i]   ")
                 end
                 if i > j
                     @printf(output_file, "%9.3g", mat[i,j])
